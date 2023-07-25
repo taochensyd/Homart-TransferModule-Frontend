@@ -37,12 +37,7 @@ const TransferPage = ({ username }) => {
   const [remarks, setRemarks] = useState();
   const [transferObject, setTransferObject] = useState([]);
 
-
-
-
-
-
-/*
+  /*
   1. Login to SAP session
   2. Check if user account is valid
   3. Search for batch number
@@ -80,25 +75,7 @@ const TransferPage = ({ username }) => {
     13.3 If Abort button is clicked, hide summary of transfer details
   14. Show success/error message
   15. If Transfer is successful, clear all fields and hide summary of transfer details.
-
-
   */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const handleDateChange = (event) => {
     const selectedDate = new Date(event.target.value);
@@ -150,13 +127,33 @@ const TransferPage = ({ username }) => {
     }
   }, [selectedFromBin]);
 
-
-
-
-
-
-
-
+  // Clear All button
+  const clearAllClick = () => {
+    setBatchNumber("");
+    setItemCode("");
+    setItemDescription("");
+    setStatus("");
+    setWarehouses([]);
+    setFromWarehouses("");
+    setSelectedWarehouse("");
+    setSelectedFromBin("");
+    setSelectedFromBinID("");
+    setSelectedToWarehouse("");
+    setSelectedToBin("");
+    setQuantity("");
+    setMaxQuantity("");
+    setUomName("");
+    setBatchInBin([]);
+    setBins([]);
+    setToWarehouses(["WIQ", "W3Q", "WFP", "WPQ", "WRJ", "WRV", "WRT", "WCP"]);
+    setWarehouseDestnation();
+    setToBins([]);
+    setToBinID([]);
+    setDate(new Date().toISOString().slice(0, 10));
+    setJournalMemo();
+    setRemarks();
+    setTransferObject([]);
+  };
 
   // Clicking the Search button will call this function
   const handleSearchClick = async () => {
@@ -185,23 +182,6 @@ const TransferPage = ({ username }) => {
     }
     handleItemSearch();
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const handleItemSearch = async () => {
     try {
@@ -276,11 +256,6 @@ const TransferPage = ({ username }) => {
       console.error(error);
     }
   };
-
-
-
-
-
 
   return (
     <div>
@@ -424,7 +399,7 @@ const TransferPage = ({ username }) => {
         </div>
         <div className="row">
           <div className="cell">
-            <button onClick={() => {}}>Clear All</button>
+            <button onClick={clearAllClick}>Clear All</button>
           </div>
           <div className="cell"></div>
           <div className="cell">
