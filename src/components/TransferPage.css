@@ -1,0 +1,20 @@
+.flexbox {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+}
+
+.cell {
+  width: calc(100% / 3);
+  text-align: left;
+  padding-top: 5px;
+  padding-left: 2%;
+}
+
+.db {
+  color: red;
+}
