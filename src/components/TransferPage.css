@@ -18,3 +18,33 @@
 .db {
   color: red;
 }
+
+.error {
+  color: red;
+  border: 1px solid red;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+  width: auto;
+  text-align: center;
+}
+
+.error-message {
+  color: red;
+  border: 1px solid red;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+  width: auto;
+  text-align: center;
+}
+
+.success {
+  color: green;
+  border: 1px solid green;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+  width: auto;
+  text-align: center;
+}

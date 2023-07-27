@@ -1,0 +1,56 @@
+.error {
+  color: red;
+  border: 1px solid red;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 0 auto;
+  width: 30%;
+  text-align: center;
+}
+
+.parentContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid black;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.loginForm h2 {
+  margin-bottom: 20px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.loginForm input {
+  margin-top: 5px;
+}
+
+.error {
+  color: red;
+  margin-bottom: 20px;
+}
+
+.yellow-background {
+  background-color: #FFFFCC;
+}
+
+
+@media (min-width: 1200px) {
+  .loginForm {
+    width: 40%;
+    height: 70%;
+  }
+}

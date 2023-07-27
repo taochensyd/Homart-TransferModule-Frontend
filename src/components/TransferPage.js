@@ -36,6 +36,8 @@ const TransferPage = ({ username }) => {
   const [journalMemo, setJournalMemo] = useState();
   const [remarks, setRemarks] = useState();
   const [transferObject, setTransferObject] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [rowData, setRowData] = useState([]);
 
   /*
   1. Login to SAP session
@@ -121,7 +123,7 @@ const TransferPage = ({ username }) => {
 
   React.useEffect(() => {
     if (selectedFromBin) {
-      setToWarehouses(["WIQ", "W3Q", "WFP", "WPQ", "WRJ", "WRV", "WRT", "WCP"]);
+      setToWarehouses(["WIQ", "WCP", "WRV", "W3Q", "WFP", "WPQ", "WRJ", "WRT"]);
     } else {
       setToWarehouses([]);
     }
@@ -145,13 +147,12 @@ const TransferPage = ({ username }) => {
     setUomName("");
     setBatchInBin([]);
     setBins([]);
-    setToWarehouses(["WIQ", "W3Q", "WFP", "WPQ", "WRJ", "WRV", "WRT", "WCP"]);
     setWarehouseDestnation();
     setToBins([]);
     setToBinID([]);
     setDate(new Date().toISOString().slice(0, 10));
-    setJournalMemo();
-    setRemarks();
+    setJournalMemo("");
+    setRemarks("");
     setTransferObject([]);
   };
 
@@ -169,6 +170,29 @@ const TransferPage = ({ username }) => {
         response.data.value &&
         response.data.value.length > 0
       ) {
+        // Clear all fields
+        setErrorMessage("");
+        setWarehouses([]);
+        setFromWarehouses("");
+        setSelectedWarehouse("");
+        setSelectedFromBin("");
+        setSelectedFromBinID("");
+        setSelectedToWarehouse("");
+        setSelectedToBin("");
+        setQuantity("");
+        setMaxQuantity("");
+        setUomName("");
+        setBatchInBin([]);
+        setBins([]);
+        setWarehouseDestnation();
+        setToBins([]);
+        setToBinID([]);
+        setDate(new Date().toISOString().slice(0, 10));
+        setJournalMemo("");
+        setRemarks("");
+        setTransferObject([]);
+
+        //Set the data from the response
         setItemCode(response.data.value[0].ItemCode);
         setItemDescription(response.data.value[0].ItemDescription);
         if (response.data.value[0].Status.includes("_")) {
@@ -176,11 +200,42 @@ const TransferPage = ({ username }) => {
         } else {
           setStatus(response.data.value[0].Status);
         }
+      } else {
+        setErrorMessage("Batch number not found");
       }
     } catch (error) {
       console.error(error);
     }
+    fetchBatchInBin();
     handleItemSearch();
+  };
+
+  const fetchBatchInBin = async (batchNumber) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3005/api/batchinbin",
+        {
+          BatchNumber: batchNumber,
+        }
+      );
+      if (!response.data.value) {
+        setErrorMessage("Stock infomation not found for this batch number.");
+        setBatchInBin([]);
+        setBins([]);
+        setWarehouses([]);
+      } else if (response.data.value.length === 0) {
+        setErrorMessage("No stock in any warehouse");
+        setBatchInBin([]);
+        setBins([]);
+        setWarehouses([]);
+      } else if (response.data && response.data.value) {
+        setBatchInBin(response.data.value);
+        setWarehouses(response.data.value.map((item) => item.WarehouseCode));
+        setBins(response.data.value.map((item) => item.BinCode));
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleItemSearch = async () => {
@@ -189,19 +244,8 @@ const TransferPage = ({ username }) => {
         ItemNumber: itemCode,
       });
       setUomName(response.data.InventoryUOM);
-      if (response.data.ItemWarehouseInfoCollection) {
-        const filteredWarehouses =
-          response.data.ItemWarehouseInfoCollection.filter(
-            (item) => item.InStock > 0
-          );
-        setWarehouses(
-          filteredWarehouses.map((item) => ({
-            WarehouseCode: item.WarehouseCode,
-            InStock: item.InStock,
-          }))
-        );
-      }
     } catch (error) {
+      setUomName("");
       console.error(error);
     }
   };
@@ -224,34 +268,25 @@ const TransferPage = ({ username }) => {
     setMaxQuantity(maxQty);
   };
 
-  const fetchBatchInBin = async (batchNumber) => {
+  const fetchBinLocations = async (warehouseCodes) => {
     try {
-      const response = await axios.post(
-        "http://localhost:3005/api/batchinbin",
-        {
-          BatchNumber: batchNumber,
-        }
-      );
-      if (response.data && response.data.value) {
-        setBatchInBin(response.data.value);
-        setBins(response.data.value.map((item) => item.BinCode));
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchBinLocations = async (warehouseCode) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:3005/api/binlocations",
-        {
+      const requests = warehouseCodes.map((warehouseCode) =>
+        axios.post("http://localhost:3005/api/binlocations", {
           WarehouseCode: warehouseCode,
-        }
+        })
       );
-      if (response.data && response.data.value) {
-        setToBins(response.data.value.map((item) => item.BinCode));
-      }
+      const responses = await Promise.all(requests);
+      const combinedData = responses.reduce((acc, response) => {
+        if (response.data && response.data.value) {
+          response.data.value.forEach((item) => {
+            acc.AbsEntry = (acc.AbsEntry || []).concat(item.AbsEntry);
+            acc.Warehouse = (acc.Warehouse || []).concat(item.Warehouse);
+            acc.BinCode = (acc.BinCode || []).concat(item.BinCode);
+          });
+        }
+        return acc;
+      }, {});
+      setToBins(combinedData.BinCode);
     } catch (error) {
       console.error(error);
     }
@@ -260,6 +295,7 @@ const TransferPage = ({ username }) => {
   return (
     <div>
       <h2>Transfer Page</h2>
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
       <div className="flexbox">
         <div className="row">
           <div className="cell">Login Person</div>
