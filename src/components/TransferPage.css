@@ -48,3 +48,11 @@
   width: auto;
   text-align: center;
 }
+
+.yellow-background {
+  background-color: #FFFFCC;
+}
+
+.grey-background {
+  background-color: #DBDBDB;
+}

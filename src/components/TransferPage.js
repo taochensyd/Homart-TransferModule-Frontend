@@ -29,6 +29,7 @@ const TransferPage = ({ username }) => {
     "WRT",
     "WCP",
   ]);
+  const [selectedToWarehouseName, setSelectedToWarehouseName] = useState("");
   const [warehouseDestnation, setWarehouseDestnation] = useState();
   const [toBins, setToBins] = useState([]);
   const [toBinID, setToBinID] = useState([]);
@@ -109,15 +110,12 @@ const TransferPage = ({ username }) => {
   React.useEffect(() => {
     if (selectedToWarehouse) {
       fetchBinLocations(selectedToWarehouse);
+      if (selectedToWarehouse === "WIQ") {
+        setSelectedToWarehouseName("Incoming Quarantine Warehouse");
+      }
+      
     } else {
       setToBins([]);
-    }
-  }, [selectedToWarehouse]);
-
-  // Call this function whenever the selectedToWarehouse changes
-  React.useEffect(() => {
-    if (selectedToWarehouse) {
-      fetchBinLocations(selectedToWarehouse);
     }
   }, [selectedToWarehouse]);
 
@@ -306,6 +304,7 @@ const TransferPage = ({ username }) => {
           <div className="cell">Batch Number</div>
           <div className="cell">
             <input
+              className="yellow-background"
               type="text"
               value={batchNumber}
               onChange={(event) => setBatchNumber(event.target.value)}
@@ -317,18 +316,19 @@ const TransferPage = ({ username }) => {
         </div>
         <div className="row">
           <div className="cell">Item Code</div>
-          <div className="cell">{itemCode}</div>
-          <div className="cell">{status}</div>
+          <div className="cell grey-background">{itemCode}</div>
+          <div className="cell grey-background">{status}</div>
         </div>
         <div className="row">
-          <div className="cell">Item Description</div>
-          <div className="cell">{itemDescription}</div>
+          <div className="cell ">Item Description</div>
+          <div className="cell grey-background">{itemDescription}</div>
           <div className="cell"></div>
         </div>
         <div className="row">
           <div className="cell">From Warehouse</div>
           <div className="cell">
             <select
+              className="yellow-background"
               value={selectedWarehouse}
               onChange={(event) => setSelectedWarehouse(event.target.value)}
             >
@@ -350,6 +350,7 @@ const TransferPage = ({ username }) => {
           <div className="cell">From Bin</div>
           <div className="cell">
             <select
+              className="yellow-background"
               value={selectedFromBin}
               onChange={(event) => setSelectedFromBin(event.target.value)}
             >
@@ -367,6 +368,7 @@ const TransferPage = ({ username }) => {
           <div className="cell">To Warehouse</div>
           <div className="cell">
             <select
+              className="yellow-background"
               value={selectedToWarehouse}
               onChange={(event) => setSelectedToWarehouse(event.target.value)}
             >
@@ -378,13 +380,14 @@ const TransferPage = ({ username }) => {
               ))}
             </select>
           </div>
-          <div className="cell"></div>
+          <div className="cell grey-background">{selectedToWarehouseName}</div>
         </div>
 
         <div className="row">
           <div className="cell">To Bin</div>
           <div className="cell">
             <select
+              className="yellow-background"
               value={selectedToBin}
               onChange={(event) => setSelectedToBin(event.target.value)}
             >
@@ -403,24 +406,32 @@ const TransferPage = ({ username }) => {
           <div className="cell">Quantity</div>
           <div className="cell">
             <input
+              className="yellow-background"
               type="number"
               step="1"
               value={quantity}
               onChange={(event) => setQuantity(event.target.value)}
             />
           </div>
-          <div className="cell">Maximum Qty = {maxQuantity}</div>
+          <div className="cell grey-background">
+            Maximum Qty = {maxQuantity}
+          </div>
         </div>
         <div className="row">
           <div className="cell">UoM Name</div>
-          <div className="cell">{uomName}</div>
+          <div className="cell grey-background">{uomName}</div>
           <div className="cell"></div>
         </div>
 
         <div className="row">
           <div className="cell">Posting Date</div>
           <div className="cell">
-            <input type="date" value={date} onChange={handleDateChange} />
+            <input
+              className="yellow-background"
+              type="date"
+              value={date}
+              onChange={handleDateChange}
+            />
             {/* <div>{formatDate(date)}</div> */}
           </div>
           <div className="cell"></div>
@@ -429,7 +440,7 @@ const TransferPage = ({ username }) => {
         <div className="row">
           <div className="cell">Remarks</div>
           <div className="cell">
-            <textarea></textarea>
+            <textarea className="yellow-background"></textarea>
           </div>
           <div className="cell"></div>
         </div>
