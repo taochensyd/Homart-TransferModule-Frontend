@@ -14,7 +14,9 @@ const TransferPage = ({ username }) => {
   const [selectedFromBinID, setSelectedFromBinID] = useState("");
   const [selectedToWarehouse, setSelectedToWarehouse] = useState("");
   const [selectedToBin, setSelectedToBin] = useState("");
+  const [selectedToBinID, setSelectedToBinID] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [enteredQuantity, setEnteredQuantity] = useState(0);
   const [maxQuantity, setMaxQuantity] = useState("");
   const [uomName, setUomName] = useState("");
   const [batchInBin, setBatchInBin] = useState([]);
@@ -112,6 +114,22 @@ const TransferPage = ({ username }) => {
       fetchBinLocations(selectedToWarehouse);
       if (selectedToWarehouse === "WIQ") {
         setSelectedToWarehouseName("Incoming Quarantine Warehouse");
+      } else if (selectedToWarehouse === "WCP") {
+        selectedToWarehouseName("Component Warehouse");
+      } else if (selectedToWarehouse === "WFP") {
+        selectedToWarehouseName("Finished Product Warehouse");
+      } else if (selectedToWarehouse === "WIQ") {
+        selectedToWarehouseName("Incoming Quarantine Warehouse");
+      } else if (selectedToWarehouse === "WPQ") {
+        selectedToWarehouseName("Production Quarantine Warehouse");
+      } else if (selectedToWarehouse === "WRJ") {
+        selectedToWarehouseName("Reject Warehouse");
+      } else if (selectedToWarehouse === "WRT") {
+        selectedToWarehouseName("Return Warehouse");
+      } else if (selectedToWarehouse === "WRV") {
+        selectedToWarehouseName("Review Warehouse");
+      } else {
+        selectedToWarehouseName("XXX");
       }
       
     } else {
@@ -222,7 +240,7 @@ const TransferPage = ({ username }) => {
         setBins([]);
         setWarehouses([]);
       } else if (response.data.value.length === 0) {
-        setErrorMessage("No stock in any warehouse");
+        setErrorMessage("No stock available for this batch number.");
         setBatchInBin([]);
         setBins([]);
         setWarehouses([]);
@@ -413,13 +431,13 @@ const TransferPage = ({ username }) => {
               onChange={(event) => setQuantity(event.target.value)}
             />
           </div>
-          <div className="cell grey-background">
+          <div className="cell grey-background display-only">
             Maximum Qty = {maxQuantity}
           </div>
         </div>
         <div className="row">
           <div className="cell">UoM Name</div>
-          <div className="cell grey-background">{uomName}</div>
+          <div className="cell grey-background display-only">{uomName}</div>
           <div className="cell"></div>
         </div>
 
@@ -440,7 +458,7 @@ const TransferPage = ({ username }) => {
         <div className="row">
           <div className="cell">Remarks</div>
           <div className="cell">
-            <textarea className="yellow-background"></textarea>
+            <textarea className="remarks yellow-background"></textarea>
           </div>
           <div className="cell"></div>
         </div>

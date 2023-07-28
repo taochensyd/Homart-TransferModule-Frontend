@@ -56,3 +56,14 @@
 .grey-background {
   background-color: #DBDBDB;
 }
+
+.remarks {
+  height: 129px;
+  width: 361px;
+}
+
+.display-only {
+  background-color: #DBDBDB;
+  border: 1px solid black;
+
+}
