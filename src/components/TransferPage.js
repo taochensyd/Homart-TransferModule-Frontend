@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./TransferPage.css"; // make sure to import the CSS file
+import "./TransferPage.css";
 
 const TransferPage = ({ username }) => {
   const [batchNumber, setBatchNumber] = useState("");
   const [itemCode, setItemCode] = useState("");
   const [itemDescription, setItemDescription] = useState("");
-  const [status, setStatus] = useState("");
+  const [batchStatus, setBatchStatus] = useState("");
   const [warehouses, setWarehouses] = useState([]);
   const [fromWarehouse, setFromWarehouses] = useState("");
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
@@ -41,6 +41,44 @@ const TransferPage = ({ username }) => {
   const [transferObject, setTransferObject] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [rowData, setRowData] = useState([]);
+
+
+
+
+  /*
+  
+      const [username, setUsername] = React.useState('');
+      const [password, setPassword] = React.useState('');
+      const [batchNumber, setBatchNumber] = React.useState('');
+      const [itemCode, setItemCode] = React.useState('');
+      const [itemDescription, setItemDescription] = React.useState('');
+      const [batchStatus, setBatchStatus] = React.useState('');
+      const [warehouses, setWarehouses] = React.useState([]);
+      const [selectedWarehouse, setSelectedWarehouse] = React.useState('');
+      const [bins, setBins] = React.useState([]);
+      const [selectedFromBin, setSelectedFromBin] = React.useState('');
+      const [toWarehouse, setToWarehouse] = React.useState('');
+      const [selectedToWarehouse, setSelectedToWarehouse] = React.useState('');
+      const [toBins, setToBins] = React.useState([]);
+      const [selectedToBin, setSelectedToBin] = React.useState('');
+      const [quantity, setQuantity] = React.useState('');
+      const [postingDate, setPostingDate] = React.useState('');
+      const [remarks, setRemarks] = React.useState('');
+      const [errorMessage, setErrorMessage] = React.useState('');
+      const [successMessage, setSuccessMessage] = React.useState('');
+      const [showSummary, setShowSummary] = React.useState(false);
+      const [transferDetails, setTransferDetails] = React.useState({});
+      const [transferStatus, setTransferStatus] = React.useState('');
+  
+  
+  */
+
+
+
+
+
+
+
 
   /*
   1. Login to SAP session
@@ -131,7 +169,7 @@ const TransferPage = ({ username }) => {
       } else {
         selectedToWarehouseName("XXX");
       }
-      
+
     } else {
       setToBins([]);
     }
@@ -150,7 +188,7 @@ const TransferPage = ({ username }) => {
     setBatchNumber("");
     setItemCode("");
     setItemDescription("");
-    setStatus("");
+    setBatchStatus("");
     setWarehouses([]);
     setFromWarehouses("");
     setSelectedWarehouse("");
@@ -211,10 +249,10 @@ const TransferPage = ({ username }) => {
         //Set the data from the response
         setItemCode(response.data.value[0].ItemCode);
         setItemDescription(response.data.value[0].ItemDescription);
-        if (response.data.value[0].Status.includes("_")) {
-          setStatus(response.data.value[0].Status.split("_")[1].toUpperCase());
+        if (response.data.value[0].batchStatus.includes("_")) {
+          setBatchStatus(response.data.value[0].batchStatus.split("_")[1].toUpperCase());
         } else {
-          setStatus(response.data.value[0].Status);
+          setBatchStatus(response.data.value[0].batchStatus);
         }
       } else {
         setErrorMessage("Batch number not found");
@@ -318,6 +356,11 @@ const TransferPage = ({ username }) => {
           <div className="cell">{username.toUpperCase()}</div>
           <div className="cell db">DB:Homart_Live</div>
         </div>
+
+
+
+
+
         <div className="row">
           <div className="cell">Batch Number</div>
           <div className="cell">
@@ -332,16 +375,29 @@ const TransferPage = ({ username }) => {
             <button onClick={handleSearchClick}>Search</button>
           </div>
         </div>
+
+
+
+
         <div className="row">
           <div className="cell">Item Code</div>
           <div className="cell grey-background">{itemCode}</div>
-          <div className="cell grey-background">{status}</div>
+          <div className="cell grey-background">{batchStatus}</div>
         </div>
+
+
+
+
         <div className="row">
           <div className="cell ">Item Description</div>
           <div className="cell grey-background">{itemDescription}</div>
           <div className="cell"></div>
         </div>
+
+
+
+
+
         <div className="row">
           <div className="cell">From Warehouse</div>
           <div className="cell">
@@ -364,6 +420,11 @@ const TransferPage = ({ username }) => {
           </div>
           <div className="cell">{selectedWarehouse}</div>
         </div>
+
+
+
+
+
         <div className="row">
           <div className="cell">From Bin</div>
           <div className="cell">
@@ -382,6 +443,14 @@ const TransferPage = ({ username }) => {
           </div>
           <div className="cell"></div>
         </div>
+
+
+
+
+
+
+
+
         <div className="row">
           <div className="cell">To Warehouse</div>
           <div className="cell">
@@ -400,6 +469,11 @@ const TransferPage = ({ username }) => {
           </div>
           <div className="cell grey-background">{selectedToWarehouseName}</div>
         </div>
+
+
+
+
+
 
         <div className="row">
           <div className="cell">To Bin</div>
@@ -420,6 +494,11 @@ const TransferPage = ({ username }) => {
           <div className="cell"></div>
         </div>
 
+
+
+
+
+
         <div className="row">
           <div className="cell">Quantity</div>
           <div className="cell">
@@ -435,11 +514,20 @@ const TransferPage = ({ username }) => {
             Maximum Qty = {maxQuantity}
           </div>
         </div>
+
+
+
+
+
         <div className="row">
           <div className="cell">UoM Name</div>
           <div className="cell grey-background display-only">{uomName}</div>
           <div className="cell"></div>
         </div>
+
+
+
+
 
         <div className="row">
           <div className="cell">Posting Date</div>
@@ -455,6 +543,10 @@ const TransferPage = ({ username }) => {
           <div className="cell"></div>
         </div>
 
+
+
+
+
         <div className="row">
           <div className="cell">Remarks</div>
           <div className="cell">
@@ -462,13 +554,18 @@ const TransferPage = ({ username }) => {
           </div>
           <div className="cell"></div>
         </div>
+
+
+
+
+
         <div className="row">
           <div className="cell">
             <button onClick={clearAllClick}>Clear All</button>
           </div>
           <div className="cell"></div>
           <div className="cell">
-            <button onClick={() => {}}>Transfer</button>
+            <button onClick={() => { }}>Transfer</button>
           </div>
         </div>
       </div>
