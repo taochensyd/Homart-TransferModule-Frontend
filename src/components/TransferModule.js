@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import UserLogin from "./UserLogin"; // make sure to import the child component
-import TransferPage from "./TransferPage"; // make sure to import the TransferPage component
+import UserLogin from "./UserLogin";
+import TransferPage from "./TransferPage";
 import TransferForm from "./TransferForm";
 
 const TransferModule = () => {

@@ -305,6 +305,21 @@ function TransferForm({ username }) {
   };
 
   // Below function will be used to check if posting date is valid
+  const handleDateChange = (event) => {
+    const selectedDate = new Date(event.target.value);
+    const currentDate = new Date();
+    if (selectedDate <= currentDate) {
+      setPostingDate(event.target.value);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
   // Below function will be used to clear all fields
 
@@ -558,23 +573,19 @@ function TransferForm({ username }) {
       {/* // Below row allows user to enter a posting date */}
       <div className="row">
         <div className="cell">Posting Date</div>
-        <div className="cell">
           <input
-            className="yellow-background"
+            className="yellow-background cell"
             type="date"
             value={postingDate}
             onChange={handlePostingDateChange}
           />
           {/* <div>{formatDate(date)}</div> */}
-        </div>
         <div className="cell"></div>
       </div>
       {/* // Remarks field */}
       <div className="row">
         <div className="cell">Remarks</div>
-        <div className="cell">
-          <textarea className="remarks yellow-background"></textarea>
-        </div>
+        <textarea className="remarks yellow-background cell"></textarea>
         <div className="cell"></div>
       </div>
       {/* // Clear All, Add and Transfer buttons */}
