@@ -82,17 +82,14 @@ function TransferForm({ username }) {
 
   // Below are the functions that will be used in the Transfer Form
   // Below function will be used to search for batch number indlude item code, item description, status
-  
-  
+
   /*
   
     Below is Setp 1:
   
   
   */
-  
-  
-  
+
   const handleSearchClick = async () => {
     // Sample response from API
     /*
@@ -247,15 +244,12 @@ function TransferForm({ username }) {
     }
   };
 
-
-
   /*
   
     Below is Step 2
   
   
   */
-
 
   // Below function will be used to get list of bins in that warehouse
   const fetchBinLocations = async () => {
@@ -346,28 +340,56 @@ function TransferForm({ username }) {
   const checkAllFileds = () => {
     let checkList = [];
 
-    if(itemCode === "") {
+    if (itemCode === "") {
       checkList.push("Item Code is required");
     }
 
-    if(enteredQuantity > maxQuantity) {
+    if (selectedFromBin === "") {
+      checkList.push("From Bin is required");
+    }
+
+    if (selectedWarehouse === "") {
+      checkList.push("From Warehouse is required");
+    }
+
+    if (toWarehouses === "") {
+      checkList.push("To Warehouse is required");
+    }
+
+    if (
+      (selectedToBin === "" && selectedToWarehouse === "WIQ") ||
+      selectedToWarehouse === "WRV" ||
+      selectedToWarehouse === "WCP"
+    ) {
+      checkList.push("To Bin is required");
+    }
+
+    if (enteredQuantity > maxQuantity) {
       checkList.push("Quantity entered is more than available stock.");
     }
 
-    if(ware){
-
+    if (postingDate === "") {
+      checkList.push("Posting Date is required");
     }
 
+    if (remarks.length > 254) {
+      checkList.push("Remarks cannot be more than 254 characters");
+    }
 
-    if(checkList.length >0) {
+    /*
+      // Need to check Remark/comment length
+    */
+    if (remarks.length > 254) {
+      // Waiting to be confirm
+      checkList.push("Remarks cannot be more than 254 characters");
+    }
+
+    if (checkList.length > 0) {
       return false;
     } else {
       return true;
     }
-
-
-
-  }
+  };
 
   // Below function will be used to submit Transfer
 
@@ -403,13 +425,10 @@ function TransferForm({ username }) {
 
   // Below function will be used to submit Transfer
   const startTransfer = async () => {
-
     if (checkAllFileds() === true) {
-
     } else {
       setErrorMessage("Please fill in all fields");
     }
-
 
     try {
       const response = await axios.post("http://localhost:3005/api/transfer", {
@@ -471,7 +490,6 @@ function TransferForm({ username }) {
       setToWarehouses([]);
     }
   }, [selectedFromBin]);
-
 
   // Below is the actual Transfer Form that will be displayed
   return (
@@ -628,13 +646,13 @@ function TransferForm({ username }) {
       {/* // Below row allows user to enter a posting date */}
       <div className="row">
         <div className="cell">Posting Date</div>
-          <input
-            className="yellow-background cell"
-            type="date"
-            value={postingDate}
-            onChange={handlePostingDateChange}
-          />
-          {/* <div>{formatDate(date)}</div> */}
+        <input
+          className="yellow-background cell"
+          type="date"
+          value={postingDate}
+          onChange={handlePostingDateChange}
+        />
+        {/* <div>{formatDate(date)}</div> */}
         <div className="cell"></div>
       </div>
       {/* // Remarks field */}
