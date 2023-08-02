@@ -36,7 +36,7 @@ const TransferPage = ({ username }) => {
   const [toBins, setToBins] = useState([]);
   const [toBinID, setToBinID] = useState([]);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [journalMemo, setJournalMemo] = useState();
+  const [journalMemo, setJournalMemo] = useState("");
   const [remarks, setRemarks] = useState();
   const [transferObject, setTransferObject] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");

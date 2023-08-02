@@ -17,9 +17,14 @@
     align-items: center;
   }
   
-  .error {
+  .error-message {
     color: red;
-    margin-bottom: 20px;
+    border: 1px solid red;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
+    width: auto;
+    text-align: center;
   }
   
   .yellow-background {

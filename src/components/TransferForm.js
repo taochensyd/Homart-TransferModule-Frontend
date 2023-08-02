@@ -82,6 +82,17 @@ function TransferForm({ username }) {
 
   // Below are the functions that will be used in the Transfer Form
   // Below function will be used to search for batch number indlude item code, item description, status
+  
+  
+  /*
+  
+    Below is Setp 1:
+  
+  
+  */
+  
+  
+  
   const handleSearchClick = async () => {
     // Sample response from API
     /*
@@ -170,7 +181,7 @@ function TransferForm({ username }) {
         ItemNumber: itemCode,
       });
 
-      console.log(response.data);
+      console.log(`API(Items).UOM: ${response.data}`);
 
       if (response.data.InventoryUOM) {
         setUomName(response.data.InventoryUOM);
@@ -193,7 +204,7 @@ function TransferForm({ username }) {
         }
       );
 
-      console.log(response.data);
+      console.log(`fetcBatchInBin: ${response.data}`);
 
       if (!response.data.value) {
         setErrorMessage("Stock information not found for this batch number.");
@@ -217,7 +228,7 @@ function TransferForm({ username }) {
           let tempWarehouses = [];
           for (let i = 0; i < batchInBin.length; i++) {
             if (!tempWarehouses.includes(batchInBin[i].WhsCode)) {
-              tempWarehouses.append(batchInBin[i].WhsCode);
+              tempWarehouses.push(batchInBin[i].WhsCode);
             }
             setWarehouses(tempWarehouses);
             if (!fromBins.includes(batchInBin[i].BinCode)) {
@@ -236,6 +247,16 @@ function TransferForm({ username }) {
     }
   };
 
+
+
+  /*
+  
+    Below is Step 2
+  
+  
+  */
+
+
   // Below function will be used to get list of bins in that warehouse
   const fetchBinLocations = async () => {
     if (
@@ -245,7 +266,7 @@ function TransferForm({ username }) {
     ) {
       try {
         const response = await axios.post(
-          "http://localhost:3005/api/binsinwarehouse",
+          "http://localhost:3005/api/binlocations",
           {
             WarehouseCode: selectedWarehouse,
           }
@@ -321,7 +342,18 @@ function TransferForm({ username }) {
     return `${day}-${month}-${year}`;
   };
 
-  // Below function will be used to clear all fields
+  // Below function will be used to check if all fields are filled
+  const checkAllFileds = () => {
+    let checkList = [];
+    if(checkList.length >0) {
+      return false;
+    } else {
+      return true;
+    }
+
+
+
+  }
 
   // Below function will be used to submit Transfer
 
@@ -357,6 +389,14 @@ function TransferForm({ username }) {
 
   // Below function will be used to submit Transfer
   const startTransfer = async () => {
+
+    if (checkAllFileds() === true) {
+
+    } else {
+      setErrorMessage("Please fill in all fields");
+    }
+
+
     try {
       const response = await axios.post("http://localhost:3005/api/transfer", {
         transferDetails,
@@ -417,6 +457,7 @@ function TransferForm({ username }) {
       setToWarehouses([]);
     }
   }, [selectedFromBin]);
+
 
   // Below is the actual Transfer Form that will be displayed
   return (
