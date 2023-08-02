@@ -345,6 +345,20 @@ function TransferForm({ username }) {
   // Below function will be used to check if all fields are filled
   const checkAllFileds = () => {
     let checkList = [];
+
+    if(itemCode === "") {
+      checkList.push("Item Code is required");
+    }
+
+    if(enteredQuantity > maxQuantity) {
+      checkList.push("Quantity entered is more than available stock.");
+    }
+
+    if(ware){
+
+    }
+
+
     if(checkList.length >0) {
       return false;
     } else {
