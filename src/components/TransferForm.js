@@ -105,6 +105,15 @@ function TransferForm({ username }) {
       }
     */
 
+      // Clear error message
+      setErrorMessage("");
+
+
+      if (batchNumber === "") {
+        setErrorMessage("Please enter a batch number");
+        return;
+      }
+
     try {
       /*
       Clear all fields

@@ -1,5 +1,8 @@
 /*
 
+    Start of every function:
+        set Error Message to empty object
+
     Define all the function here
     APi request data:
     1. /api/batchnumberdetail
@@ -53,7 +56,7 @@
         -   If input number in the input box is empty then don't show any message
         -   If more than maximum then show error message
 
-    
+
 
 
 
@@ -62,7 +65,26 @@
 
 
 
+/*
 
+    // Object for error message:
+    errorMessage = {
+        Batch Number: "",
+        Item Code: "",
+        Item Description: "",
+        UoM Name: "",
+        Batch Status: "",
+        Batch Quantity: "",
+        From Warehouse: "",
+        From Bin: "",
+        To Warehouse: "",
+        ToBin: "",
+        Quantity: "",
+        Posting Date: "",
+        Remarks: ""
+    }
+
+*/
 
 
 
