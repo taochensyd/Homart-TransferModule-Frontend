@@ -1,5 +1,77 @@
 /*
 
+    Define all the function here
+    APi request data:
+    1. /api/batchnumberdetail
+    2. /api/items
+    3. /api/batchinbin
+    4. /api/binlocations
+    
+    // Below is the function that need to be define
+    1. Get the current date and convert it in DD/MM/YYYY format and set it to variable
+    2. 
+    
+
+    Button:
+    Search Button:
+        -   Set the Batch number to variable
+
+    Clear All Button:
+        -   Clear all the input field/variable
+    
+    Start Transfer Button:
+        -   Check if all the field is filled
+        -   Show the summary of the transfer detail and ask for confirmation
+        if yes then run the following function:
+            -   /api/transfer
+        else:
+            -   Hide the summary and do nothing
+
+
+    
+    UseEffect:
+    -   If batch bumber has change then run the folling function:
+        -   /api/batchnumberdetail
+        -   /api/items
+        -   /api/batchinbin
+        -   /api/binlocations
+
+    -   If from warehouse has change, based on the selected warehouse,
+        then add the available bin to the bin dropdown which belong to that warehouse:
+        -   add the From Bin to the bin dropdown
+
+    -   If warehouse is in WIQ, WRV, QCP then run the following function:
+            -   /api/binlocations
+        Else make to bin dropdown empty and grey out.
+
+    -   If the Bin has change, then run the following function:
+        -  display the available quantity in the bin, this is also the max quantity that can be transfered
+
+    -   Check the text length of Remarks, since SQL only allow 254 characters, if more than 254 then show error message
+
+    -   Check the entered quantity is not more than the available quantity in the bin,
+        -   If input number in the input box is empty then don't show any message
+        -   If more than maximum then show error message
+
+    
+
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+/*
+
     // When Page loaded
     
 
@@ -91,3 +163,41 @@
             }]
 
 */
+
+
+
+  const [batchNumber, setBatchNumber] = React.useState("");
+  const [itemCode, setItemCode] = React.useState("");
+  const [itemDescription, setItemDescription] = React.useState("");
+  const [batchStatus, setBatchStatus] = React.useState("");
+  const [batchInBin, setBatchInBin] = React.useState([]);
+  const [warehouses, setWarehouses] = React.useState([]);
+  const [selectedWarehouse, setSelectedWarehouse] = React.useState("");
+  const [fromBins, setFromBins] = React.useState([]);
+  const [selectedFromBin, setSelectedFromBin] = React.useState("");
+  const [toWarehouses, setToWarehouses] = React.useState([
+    "WIQ",
+    "W3Q",
+    "WFP",
+    "WPQ",
+    "WRJ",
+    "WRV",
+    "WRT",
+    "WCP",
+  ]);
+  const [selectedToWarehouse, setSelectedToWarehouse] = React.useState("");
+  const [selectedToWarehouseName, setSelectedToWarehouseName] =
+    React.useState("");
+  const [toBins, setToBins] = React.useState([]);
+  const [selectedToBin, setSelectedToBin] = React.useState("");
+  const [maxQuantity, setMaxQuantity] = React.useState("");
+  const [enteredQuantity, setEnteredQuantity] = React.useState("");
+  const [availableQuantity, setAvailableQuantity] = React.useState("");
+  const [postingDate, setPostingDate] = React.useState("");
+  const [uomName, setUomName] = React.useState("");
+  const [remarks, setRemarks] = React.useState("");
+  const [errorMessage, setErrorMessage] = React.useState([]);
+  const [successMessage, setSuccessMessage] = React.useState("");
+  const [showSummary, setShowSummary] = React.useState(false);
+  const [transferDetails, setTransferDetails] = React.useState([]);
+  const [transferStatus, setTransferStatus] = React.useState("");
