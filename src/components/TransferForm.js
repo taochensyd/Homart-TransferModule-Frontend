@@ -24,8 +24,7 @@ function TransferForm({ username }) {
     "WCP",
   ]);
   const [selectedToWarehouse, setSelectedToWarehouse] = useState("");
-  const [selectedToWarehouseName, setSelectedToWarehouseName] =
-    useState("");
+  const [selectedToWarehouseName, setSelectedToWarehouseName] = useState("");
   const [toBins, setToBins] = useState([]);
   const [selectedToBin, setSelectedToBin] = useState("");
   const [maxQuantity, setMaxQuantity] = useState("");
@@ -109,7 +108,7 @@ function TransferForm({ username }) {
     setErrorMessage([]);
 
     if (batchNumber === "") {
-      setErrorMessage("Please enter a batch number");
+      setErrorMessage(...errorMessage, "Please enter a batch number");
       return;
     }
 
@@ -151,7 +150,7 @@ function TransferForm({ username }) {
           setBatchStatus(response.data.value[0].batchStatus);
         }
       } else {
-        setErrorMessage("Batch number not found");
+        setErrorMessage(...errorMessage, "Batch number not found");
         setItemCode("");
         setItemDescription("");
         setBatchStatus("");
@@ -159,7 +158,10 @@ function TransferForm({ username }) {
       }
     } catch (error) {
       console.log(error);
-      setErrorMessage("Unexpected error occured. Please try again.");
+      setErrorMessage(
+        ...errorMessage,
+        "Unexpected error occured. Please try again."
+      );
       setItemCode("");
       setItemDescription("");
       setBatchStatus("");
@@ -212,12 +214,18 @@ function TransferForm({ username }) {
       console.log(`fetcBatchInBin: ${response.data}`);
 
       if (!response.data.value) {
-        setErrorMessage("Stock information not found for this batch number.");
+        setErrorMessage(
+          errorMessage,
+          "Stock information not found for this batch number."
+        );
         setBatchInBin([]);
         setFromBins([]);
         setWarehouses([]);
       } else if (response.data.value.length === 0) {
-        setErrorMessage("No stock available for this batch number.");
+        setErrorMessage(
+          errorMessage,
+          "No stock available for this batch number."
+        );
         setBatchInBin([]);
         setFromBins([]);
         setWarehouses([]);
@@ -229,7 +237,7 @@ function TransferForm({ username }) {
         }
 
         if (batchInBin.length > 0) {
-          setErrorMessage("");
+          setErrorMessage([]);
           let tempWarehouses = [];
           for (let i = 0; i < batchInBin.length; i++) {
             if (!tempWarehouses.includes(batchInBin[i].WhsCode)) {
@@ -422,7 +430,7 @@ function TransferForm({ username }) {
     setPostingDate("");
     setUomName("");
     setRemarks("");
-    setErrorMessage("");
+    setErrorMessage([]);
     setSuccessMessage("");
     setShowSummary(false);
     setTransferDetails([]);
@@ -435,7 +443,7 @@ function TransferForm({ username }) {
   const startTransfer = async () => {
     if (checkAllFileds() === true) {
     } else {
-      setErrorMessage("Please fill in all fields");
+      setErrorMessage(...errorMessage, "Please fill in all fields");
     }
 
     try {
@@ -449,7 +457,7 @@ function TransferForm({ username }) {
         setSuccessMessage("Transfer successful");
         clearAllClick();
       } else {
-        setErrorMessage("Transfer failed");
+        setErrorMessage(...errorMessage, "Transfer failed");
       }
     } catch (error) {
       console.log(error);
