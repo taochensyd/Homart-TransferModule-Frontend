@@ -1,19 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TransferForm.css";
 
 function TransferForm({ username }) {
   // Below is the list of variables that will be used in the Transfer Form
-  const [batchNumber, setBatchNumber] = React.useState("");
-  const [itemCode, setItemCode] = React.useState("");
-  const [itemDescription, setItemDescription] = React.useState("");
-  const [batchStatus, setBatchStatus] = React.useState("");
-  const [batchInBin, setBatchInBin] = React.useState([]);
-  const [warehouses, setWarehouses] = React.useState([]);
-  const [selectedWarehouse, setSelectedWarehouse] = React.useState("");
-  const [fromBins, setFromBins] = React.useState([]);
-  const [selectedFromBin, setSelectedFromBin] = React.useState("");
-  const [toWarehouses, setToWarehouses] = React.useState([
+  const [batchNumber, setBatchNumber] = useState("");
+  const [itemCode, setItemCode] = useState("");
+  const [itemDescription, setItemDescription] = useState("");
+  const [batchStatus, setBatchStatus] = useState("");
+  const [batchInBin, setBatchInBin] = useState([]);
+  const [warehouses, setWarehouses] = useState([]);
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  const [fromBins, setFromBins] = useState([]);
+  const [selectedFromBin, setSelectedFromBin] = useState("");
+  const [toWarehouses, setToWarehouses] = useState([
     "WIQ",
     "W3Q",
     "WFP",
@@ -23,22 +23,22 @@ function TransferForm({ username }) {
     "WRT",
     "WCP",
   ]);
-  const [selectedToWarehouse, setSelectedToWarehouse] = React.useState("");
+  const [selectedToWarehouse, setSelectedToWarehouse] = useState("");
   const [selectedToWarehouseName, setSelectedToWarehouseName] =
-    React.useState("");
-  const [toBins, setToBins] = React.useState([]);
-  const [selectedToBin, setSelectedToBin] = React.useState("");
-  const [maxQuantity, setMaxQuantity] = React.useState("");
-  const [enteredQuantity, setEnteredQuantity] = React.useState("");
-  const [availableQuantity, setAvailableQuantity] = React.useState("");
-  const [postingDate, setPostingDate] = React.useState("");
-  const [uomName, setUomName] = React.useState("");
-  const [remarks, setRemarks] = React.useState("");
-  const [errorMessage, setErrorMessage] = React.useState([]);
-  const [successMessage, setSuccessMessage] = React.useState("");
-  const [showSummary, setShowSummary] = React.useState(false);
-  const [transferDetails, setTransferDetails] = React.useState([]);
-  const [transferStatus, setTransferStatus] = React.useState("");
+    useState("");
+  const [toBins, setToBins] = useState([]);
+  const [selectedToBin, setSelectedToBin] = useState("");
+  const [maxQuantity, setMaxQuantity] = useState("");
+  const [enteredQuantity, setEnteredQuantity] = useState("");
+  const [availableQuantity, setAvailableQuantity] = useState("");
+  const [postingDate, setPostingDate] = useState("");
+  const [uomName, setUomName] = useState("");
+  const [remarks, setRemarks] = useState("");
+  const [errorMessage, setErrorMessage] = useState([]);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showSummary, setShowSummary] = useState(false);
+  const [transferDetails, setTransferDetails] = useState([]);
+  const [transferStatus, setTransferStatus] = useState("");
 
   /*
     1. Login to SAP session
@@ -105,14 +105,13 @@ function TransferForm({ username }) {
       }
     */
 
-      // Clear error message
-      setErrorMessage("");
+    // Clear error message
+    setErrorMessage([]);
 
-
-      if (batchNumber === "") {
-        setErrorMessage("Please enter a batch number");
-        return;
-      }
+    if (batchNumber === "") {
+      setErrorMessage("Please enter a batch number");
+      return;
+    }
 
     try {
       /*
@@ -132,7 +131,7 @@ function TransferForm({ username }) {
 
       // If batch number is valid, get item code, item description, status
       if (response.data.value.length > 0) {
-        setErrorMessage("");
+        setErrorMessage([]);
 
         // Call the function to get the UOM name
         handleItemSearch();
@@ -464,7 +463,7 @@ function TransferForm({ username }) {
 
   // Below are the React useEffect hook
   // Call this function whenever the selectedToWarehouse changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedToWarehouse) {
       fetchBinLocations(selectedToWarehouse);
       if (selectedToWarehouse === "WIQ") {
@@ -492,7 +491,7 @@ function TransferForm({ username }) {
   }, [selectedToWarehouse]);
 
   // Call this function whenever the selectedFromBin changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedFromBin) {
       setToWarehouses(["WIQ", "WCP", "WRV", "W3Q", "WFP", "WPQ", "WRJ", "WRT"]);
     } else {
@@ -504,7 +503,14 @@ function TransferForm({ username }) {
   return (
     <div className="flex-container">
       <h2>Transfer Page</h2>
-      {errorMessage && <div className="error-message">{errorMessage}</div>}
+      {errorMessage.length > 0 && (
+        <div className="error-message" style={{ visibility: "visible" }}>
+          {errorMessage.map((item, index) => (
+            <p key={index}>{item}</p>
+          ))}
+        </div>
+      )}
+
       {/* // Below row is current logged in user and database name */}
       <div className="row">
         <div className="cell">Login Person</div>
