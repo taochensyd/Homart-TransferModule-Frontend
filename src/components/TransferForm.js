@@ -506,7 +506,7 @@ function TransferForm({ username }) {
       setToWarehouses([]);
     }
   }, [selectedFromBin]);
-
+  
   // Below is the actual Transfer Form that will be displayed
   return (
     <div className="flex-container">
