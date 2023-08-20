@@ -13,12 +13,17 @@ const TransferModule = () => {
   return (
     <div>
       <h1>SAP Transfer Module</h1>
-      {userData ? (
+      {/* {userData ? (
         <TransferForm username={userData.sapusername} />
       ) : (
         <UserLogin onUserData={handleUserData} />
+      )} */}
+
+      {userData ? (
+        <TransferPage username={userData.sapusername} />
+      ) : (
+        <UserLogin onUserData={handleUserData} />
       )}
-            <TransferPage></TransferPage>
     </div>
   );
 };

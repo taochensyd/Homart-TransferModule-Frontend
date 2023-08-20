@@ -140,8 +140,11 @@ function TransferForm({ username }) {
 
         //Set the data from the response
         setItemCode(response.data.value[0].ItemCode);
+        console.log(`ItemCode: ${response.data.value[0].ItemCode}`)
         setItemDescription(response.data.value[0].ItemDescription);
+        console.log(`ItemDescription: ${response.data.value[0].ItemDescription}`)
         console.log(response.data.value[0].batchStatus);
+        console.log(`BatchStatus: ${response.data.value[0].batchStatus}`)
         if (response.data.value[0].Status.includes("_")) {
           setBatchStatus(
             response.data.value[0].Status.split("_")[1].toUpperCase()
