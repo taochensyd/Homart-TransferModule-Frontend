@@ -3,7 +3,6 @@ import axios from "axios";
 import "./TransferPage.css";
 
 const TransferPage = ({ username }) => {
-
     const [errorMessage, setErrorMessage] = useState([]);
 
     const [batchNumber, setBatchNumber] = useState("");
@@ -31,6 +30,8 @@ const TransferPage = ({ username }) => {
     const [selectedToWarehouse, setSelectedToWarehouse] = useState("");
     const [selectedToWarehouseName, setSelectedToWarehouseName] = useState("");
     const [toBins, setToBins] = useState([]);
+    const [toBinsLocation, setToBinsLocation] = useState([]);
+    const [toBinsByToWarehouse, setToBinsByToWarehouse] = useState([]);
     const [selectedToBin, setSelectedToBin] = useState("");
 
     const [errorTransferMessage, setErrorTransferMessage] = useState([]);
@@ -88,7 +89,9 @@ const TransferPage = ({ username }) => {
             console.log(response.data);
             if (response.data.value.length > 0) {
                 setItemCode(response.data.value[0].ItemCode);
+                console.log(`ItemCode: ${response.data.value[0].ItemCode}`);
                 setItemDescription(response.data.value[0].ItemDescription);
+                console.log(`ItemDescription: ${response.data.value[0].ItemDescription}`);
                 if (response.data.value[0].Status.includes("_")) {
                     setBatchStatus(
                         response.data.value[0].Status.split("_")[1].toUpperCase()
@@ -96,6 +99,7 @@ const TransferPage = ({ username }) => {
                 } else {
                     setBatchStatus(response.data.value[0].batchStatus);
                 }
+                console.log(`BatchStatus: ${response.data.value[0].Status}`);
             } else {
                 setErrorMessage(...errorMessage, "Batch number not found");
                 setItemCode("");
@@ -105,7 +109,7 @@ const TransferPage = ({ username }) => {
             }
         } catch (error) {
             // handle error here
-            console.log(error);
+            console.log(`handleBatchNumberChange: ${error}`);
         }
     };
 
@@ -115,7 +119,8 @@ const TransferPage = ({ username }) => {
             const response = await axios.post("http://localhost:3005/api/items", {
                 ItemNumber: itemCode,
             });
-            console.log(response.data);
+            console.log(`UOM API Call: ${response.data}`);
+            console.log(`UOM : ${response.data.InventoryUOM}`)
             if (response.data.InventoryUOM) {
                 setUomName(response.data.InventoryUOM);
             } else {
@@ -123,7 +128,7 @@ const TransferPage = ({ username }) => {
             }
         } catch (error) {
             setUomName("");
-            console.log(error);
+            console.log(`handleItemNumberChange: ${error}`);
         }
     }
 
@@ -135,7 +140,8 @@ const TransferPage = ({ username }) => {
                     BatchNumber: batchNumber,
                 }
             );
-            console.log(response.data);
+            console.log(JSON.stringify(response.data))
+            console.log(`fetchBatchInBin Data: ${response.data.value}`);
 
 
             if (!response.data.value) {
@@ -161,6 +167,7 @@ const TransferPage = ({ username }) => {
             setTransferDetailsSummary([]);
 
             if (response.data && response.data.value) {
+                console.log(`setBatchInBin: ${response.data.value}`);
                 setBatchInBin(response.data.value);
             }
 
@@ -170,24 +177,31 @@ const TransferPage = ({ username }) => {
         }
     }
 
-    const setSourceWarehouseAndBin = (batchInBinData) => {
+    const setSourceWarehouseAndBin = (batchInBin) => {
         const newFromWarehouses = [...fromWarehouses];
-
-        if (batchInBinData && Array.isArray(batchInBinData.value)) {
-            batchInBinData.value.forEach((item) => {
+        console.log(`batchInBin: ${batchInBin}`)
+        if (batchInBin.length > 0) {
+            for (let i = 0; i < batchInBin.length; i++) {
+                const item = batchInBin[i];
                 if (!newFromWarehouses.includes(item.WhsCode)) {
                     newFromWarehouses.push(item.WhsCode);
                 }
-            });
+            }
             setFromWarehouses(newFromWarehouses);
+            console.log(`newFromWarehouses: ${newFromWarehouses}`)
+            console.log(`fromWarehouses: ${fromWarehouses}`)
 
             const newFromBins = [...fromBins];
-            batchInBinData.value.forEach((item) => {
+            for (let i = 0; i < batchInBin.length; i++) {
+                const item = batchInBin[i];
                 newFromBins.push(item.BinCode);
-            });
+            }
             setFromBins(newFromBins);
+            console.log(`newFromBins: ${newFromBins}`)
+            console.log(`fromBins: ${fromBins}`)
         }
     };
+
 
 
 
@@ -202,26 +216,52 @@ const TransferPage = ({ username }) => {
                     }
                 );
 
-                console.log(response.data);
+                console.log(`fetchBinLocations: ${response.data}`);
+
 
                 if (response.data && response.data.value) {
                     setToBins((prevToBins) => [
                         ...prevToBins,
                         ...response.data.value.map((item) => item.BinCode),
                     ]);
+                    setToBinsLocation(response.data.value);
                 }
+
+                console.log(`toBins: ${toBins}`);
             }
         } catch (error) {
-            console.log(error);
+            console.log(`fetchBinLocations: ${error}`);
         }
     };
 
-    const calculateMaxQty = (batchInBin) => {
+    const calculateMaxQty = (batchInBin, selectedFromWarehouse, selectedFromBin) => {
         let maxQty = 0;
         batchInBin.forEach((item) => {
             maxQty += item.OnHandQty;
         });
         setMaxQuantity(maxQty);
+
+        if (selectedFromWarehouse !== "") {
+            maxQty = 0;
+            batchInBin.forEach((item) => {
+                if (item.WhsCode === selectedFromWarehouse) {
+                    maxQty += item.OnHandQty;
+                }
+            });
+            setMaxQuantity(maxQty);
+        }
+
+        if (selectedFromBin !== "") {
+            maxQty = 0;
+            batchInBin.forEach((item) => {
+                if (item.BinCode === selectedFromBin) {
+                    maxQty += item.OnHandQty;
+                }
+            });
+            setMaxQuantity(maxQty);
+        }
+
+        console.log(`calculateMaxQty MaxQuantity: ${maxQty}`)
     };
 
     const getSelectedBinQty = (binCode) => {
@@ -231,35 +271,24 @@ const TransferPage = ({ username }) => {
                 setMaxQuantity(qty);
             }
         });
+
+        console.log(`setMaxQuantity getSelectedBinQty: ${qty}`)
+        console.log(`setMaxQuantity getSelectedBinQty: ${maxQuantity}`)
     }
 
     const warehouseFullName = (warehouseCode, fromOrToWarehouse) => {
-        let tempString;
-        switch (warehouseCode) {
-            case "WIQ":
-                tempString = "Incoming Quarantine Warehouse";
-                break;
-            case "WCP":
-                tempString = "Component Warehouse";
-                break;
-            case "WFP":
-                tempString = "Finished Product Warehouse";
-                break;
-            case "WPQ":
-                tempString = "Production Quarantine Warehouse";
-                break;
-            case "WRJ":
-                tempString = "Reject Warehouse";
-                break;
-            case "WRT":
-                tempString = "Return Warehouse";
-                break;
-            case "WRV":
-                tempString = "Review Warehouse";
-                break;
-            default:
-                tempString = "XXX";
-        }
+        const warehouseNames = {
+            WIQ: "Incoming Quarantine Warehouse",
+            WCP: "Component Warehouse",
+            WFP: "Finished Product Warehouse",
+            WPQ: "Production Quarantine Warehouse",
+            WRJ: "Reject Warehouse",
+            WRT: "Return Warehouse",
+            WRV: "Review Warehouse",
+            W3Q: "Level 3 Quarantine Warehouse",
+        };
+
+        const tempString = warehouseNames[warehouseCode] || "XXX";
 
         if (fromOrToWarehouse === "from") {
             setSelectedFromWarehouseName(tempString);
@@ -267,18 +296,45 @@ const TransferPage = ({ username }) => {
             setSelectedToWarehouseName(tempString);
         }
 
-    }
+        console.log(`tempString: ${tempString}`);
+        console.log(`selectedFromWarehouseName: ${selectedFromWarehouseName}`);
+    };
+
+    const filterBinBySelectedFromWarehouse = (selectedFromWarehouse, batchInBin) => {
+        const tempBin = [];
+        for (let i = 0; i < batchInBin.length; i++) {
+            const item = batchInBin[i];
+            if (item.WhsCode === selectedFromWarehouse) {
+                tempBin.push(item.BinCode);
+            }
+        }
+        setFromBins(tempBin);
+    };
+
+    const filterBinBySelectedToWarehouse = (selectedToWarehouse, toBinsLocation) => {
+        if (
+            selectedToWarehouse === "WIQ" ||
+            selectedToWarehouse === "WRV" ||
+            selectedToWarehouse === "WCP"
+        ) {
+            const tempBinCode = [];
+            for (let i = 0; i < toBinsLocation.length; i++) {
+                if (toBinsLocation[i].Warehouse === selectedToWarehouse) {
+                    tempBinCode.push(toBinsLocation[i].BinCode);
+                }
+            }
+            setToBinsByToWarehouse(tempBinCode);
+        } else {
+            setToBinsByToWarehouse([]);
+        }
+    };
+
+
 
 
     useEffect(() => {
         handleBatchNumberChange(batchNumber);
-    }, [batchNumber]);
-
-    useEffect(() => {
         fetchBatchInBin(batchNumber);
-    }, [batchNumber]);
-
-    useEffect(() => {
         fetchBinLocations(batchNumber);
     }, [batchNumber]);
 
@@ -288,10 +344,7 @@ const TransferPage = ({ username }) => {
 
     useEffect(() => {
         setSourceWarehouseAndBin(batchInBin);
-    }, [batchInBin]);
-
-    useEffect(() => {
-        calculateMaxQty(batchInBin);
+        calculateMaxQty(batchInBin, selectedFromWarehouse, selectedFromBin);
     }, [batchInBin]);
 
     useEffect(() => {
@@ -299,80 +352,122 @@ const TransferPage = ({ username }) => {
     }, [selectedFromBin]);
 
     useEffect(() => {
+        setSelectedFromBin("");
         warehouseFullName(selectedFromWarehouse, "from");
+        filterBinBySelectedFromWarehouse(selectedFromWarehouse, batchInBin);
+        calculateMaxQty(batchInBin, selectedFromWarehouse, selectedFromBin);
     }, [selectedFromWarehouse]);
 
     useEffect(() => {
+        calculateMaxQty(batchInBin, selectedFromWarehouse, selectedFromBin);
+    }, [selectedFromBin]);
+
+    useEffect(() => {
         warehouseFullName(selectedToWarehouse, "to");
+        filterBinBySelectedToWarehouse(selectedToWarehouse, toBinsLocation);
     }, [selectedToWarehouse]);
+
+
 
     return (
         <div className="form-container">
             <div className="input-group">
-                <label>Database Name:</label>
-                <input type="text" readOnly />
-            </div>
-
-            <div className="input-group">
-                <label>Login Person:</label>
-                <input type="text" readOnly />
-            </div>
-
-            <div className="input-group">
-                <label>Item Code:</label>
-                <input type="text" readOnly />
-                <span>Status:</span>
-            </div>
-
-            <div className="input-group">
-                <label>Item Description:</label>
-                <input type="text" readOnly />
-                <span>Status:</span>
+                <label>Database Name: Homart_Live</label>
+                <label>Login Person: {username}</label>
             </div>
 
             <div className="input-group">
                 <label>Batch Number:</label>
-                <input type="text" />
-                <button>Search</button>
+                <input
+                    type="text"
+                    value={batchNumber}
+                    onChange={(event) => setBatchNumber(event.target.value)}
+                />
+                <button onClick={() => setBatchNumber(batchNumber)}>Search</button>
+            </div>
+
+            <div className="input-group">
+                <label>Item Code:</label>
+                <div>{itemCode}</div>
+            </div>
+
+            <div className="input-group">
+                <label>Item Description:</label>
+                <div>{itemDescription}</div>
+            </div>
+
+            <div className="input-group">
+                <label>Status:</label>
+                <div>{batchStatus}</div>
             </div>
 
             <div className="input-group">
                 <label>From Warehouse:</label>
-                <select>
-                    {/* Options for warehouses */}
+                <select
+                    value={selectedFromWarehouse}
+                    onChange={(event) => setSelectedFromWarehouse(event.target.value)}
+                >
+                    {fromWarehouses.map((fromWarehouse) => (
+                        <option key={fromWarehouse} value={fromWarehouse}>
+                            {fromWarehouse}
+                        </option>
+                    ))}
                 </select>
+                <div>{selectedFromWarehouseName}</div>
             </div>
+
 
             <div className="input-group">
                 <label>From Bin:</label>
-                <select>
-                    {/* Options for bins */}
+                <select
+                    value={selectedFromBin}
+                    onChange={(event) => setSelectedFromBin(event.target.value)}
+                >
+                    {fromBins.map((fromBin) => (
+                        <option key={fromBin} value={fromBin}>
+                            {fromBin}
+                        </option>
+                    ))}
                 </select>
             </div>
 
             <div className="input-group">
                 <label>To Warehouse:</label>
-                <select>
-                    {/* Options for warehouses */}
+                <select
+                    value={selectedToWarehouse}
+                    onChange={(event) => setSelectedToWarehouse(event.target.value)}
+                >
+                    {toWarehouses.map((toWarehouse) => (
+                        <option key={toWarehouse} value={toWarehouse}>
+                            {toWarehouse}
+                        </option>
+                    ))}
                 </select>
+                <div>{selectedToWarehouseName}</div>
             </div>
 
             <div className="input-group">
                 <label>To Bin:</label>
-                <select>
-                    {/* Options for bins */}
+                <select
+                    value={selectedToBin}
+                    onChange={(event) => setSelectedToBin(event.target.value)}
+                >
+                    {toBinsByToWarehouse.map((toBin) => (
+                        <option key={toBin} value={toBin}>
+                            {toBin}
+                        </option>
+                    ))}
                 </select>
             </div>
 
             <div className="input-group">
                 <label>Quantity:</label>
                 <input type="number" />
-                <span>MaxQty:</span>
+                <div>MaxQty: {maxQuantity}</div>
             </div>
 
             <div className="input-group">
-                <label>UoM Name:</label>
-                <input type="text" readOnly />
+                <label>UoM Name: {uomName}</label>
             </div>
 
             <div className="input-group">
@@ -383,6 +478,12 @@ const TransferPage = ({ username }) => {
             <div className="input-group">
                 <label>Remarks:</label>
                 <textarea></textarea>
+            </div>
+
+            <div className="input-group">
+                <button>Clear All</button>
+                <button>Add</button>
+                <button>Transfer</button>
             </div>
         </div>
     )
