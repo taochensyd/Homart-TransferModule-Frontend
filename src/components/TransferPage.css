@@ -1,69 +1,33 @@
-.flexbox {
-  display: flex;
-  flex-wrap: wrap;
+.form-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-.row {
-  display: flex;
-  width: 100%;
+.input-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0;
 }
 
-.cell {
-  width: calc(100% / 3);
-  text-align: left;
-  padding-top: 5px;
-  padding-left: 2%;
+.input-group label {
+    flex: 1;
+    margin-right: 10px;
 }
 
-.db {
-  color: red;
+.input-group input,
+.input-group select,
+.input-group textarea {
+    flex: 2;
 }
 
-.error {
-  color: red;
-  border: 1px solid red;
-  border-radius: 5px;
-  padding: 5px;
-  margin: 5px;
-  width: auto;
-  text-align: center;
+.input-group button {
+    margin-left: 10px;
 }
 
-.error-message {
-  color: red;
-  border: 1px solid red;
-  border-radius: 5px;
-  padding: 5px;
-  margin: 5px;
-  width: auto;
-  text-align: center;
-}
-
-.success {
-  color: green;
-  border: 1px solid green;
-  border-radius: 5px;
-  padding: 5px;
-  margin: 5px;
-  width: auto;
-  text-align: center;
-}
-
-.yellow-background {
-  background-color: #FFFFCC;
-}
-
-.grey-background {
-  background-color: #DBDBDB;
-}
-
-.remarks {
-  height: 129px;
-  width: 361px;
-}
-
-.display-only {
-  background-color: #DBDBDB;
-  border: 1px solid black;
-
+.input-group span {
+    margin-left: 10px;
 }

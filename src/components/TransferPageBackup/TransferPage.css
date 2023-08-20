@@ -1,0 +1,69 @@
+.flexbox {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+}
+
+.cell {
+  width: calc(100% / 3);
+  text-align: left;
+  padding-top: 5px;
+  padding-left: 2%;
+}
+
+.db {
+  color: red;
+}
+
+.error {
+  color: red;
+  border: 1px solid red;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+  width: auto;
+  text-align: center;
+}
+
+.error-message {
+  color: red;
+  border: 1px solid red;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+  width: auto;
+  text-align: center;
+}
+
+.success {
+  color: green;
+  border: 1px solid green;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+  width: auto;
+  text-align: center;
+}
+
+.yellow-background {
+  background-color: #FFFFCC;
+}
+
+.grey-background {
+  background-color: #DBDBDB;
+}
+
+.remarks {
+  height: 129px;
+  width: 361px;
+}
+
+.display-only {
+  background-color: #DBDBDB;
+  border: 1px solid black;
+
+}

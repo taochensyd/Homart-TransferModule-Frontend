@@ -18,6 +18,7 @@ const TransferModule = () => {
       ) : (
         <UserLogin onUserData={handleUserData} />
       )}
+            <TransferPage></TransferPage>
     </div>
   );
 };
