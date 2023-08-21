@@ -39,11 +39,9 @@ const TransferPage = ({ username }) => {
   const [selectedToWarehouse, setSelectedToWarehouse] = useState("");
   const [selectedToWarehouseName, setSelectedToWarehouseName] = useState("");
   const [toBins, setToBins] = useState([]);
-  const [toBinsLocation, setToBinsLocation] = useState([]);
   const [wcpBinList, setWcpBinList] = useState([]);
   const [wrvBinList, setWrvBinList] = useState([]);
   const [wiqBinList, setWiqBinList] = useState([]);
-  const [toBinsByToWarehouse, setToBinsByToWarehouse] = useState([]);
   const [selectedToBin, setSelectedToBin] = useState("");
 
   const [errorTransferMessage, setErrorTransferMessage] = useState([]);
@@ -180,24 +178,32 @@ const TransferPage = ({ username }) => {
       const response = await axios.post(
         "http://localhost:3005/api/binlocations"
       );
-      console.log(`fetchBinLocations: ${response.data}`);
+      console.log(`fetchBinLocations: ${response.data.value}`);
       if (response.data && response.data.value) {
+
+        setWiqBinList([]);
+        setWcpBinList([]);
+        setWrvBinList([]);
+
         response.data.value.forEach((item) => {
           if (item.Warehouse === "WIQ") {
             setWiqBinList((prevWiqBinList) => [
               ...prevWiqBinList,
               item.BinCode,
             ]);
+            console.log(`WIQ Bin: ${item.BinCode}`);
           } else if (item.Warehouse === "WCP") {
             setWcpBinList((prevWcpBinList) => [
               ...prevWcpBinList,
               item.BinCode,
             ]);
+            console.log(`WCP Bin: ${item.BinCode}`);
           } else if (item.Warehouse === "WRV") {
             setWrvBinList((prevWrvBinList) => [
               ...prevWrvBinList,
               item.BinCode,
             ]);
+            console.log(`WRV Bin: ${item.BinCode}`);
           }
         });
       }
@@ -290,17 +296,22 @@ const TransferPage = ({ username }) => {
     setFromBins(tempBin);
   };
 
-  const updateToBins = (selectedToWarehouse) => {
+  const updateToBins = (selectedToWarehouse, wrvBinList, wiqBinList, wcpBinList) => {
+    let selectedBinList;
     if (selectedToWarehouse === "WRV") {
-      setToBins(wrvBinList);
+        setToBins(wrvBinList);
     } else if (selectedToWarehouse === "WIQ") {
-      setToBins(wiqBinList);
+        setToBins(wiqBinList);
     } else if (selectedToWarehouse === "WCP") {
-      setToBins(wcpBinList);
+        setToBins(wcpBinList);
     } else {
-      setToBins([]);
+        setToBins([]);
+        return;
     }
-  };
+    console.log(`updateToBins Function`);
+    console.log(`toBins: ${toBins}`);
+};
+
 
   const showSelectedWarehouse = () => {
     setToWarehouses(["WIQ", "W3Q", "WFP", "WPQ", "WRJ", "WRV", "WRT", "WCP"]);
@@ -350,7 +361,7 @@ const TransferPage = ({ username }) => {
   }, [selectedToWarehouse]);
 
   useEffect(() => {
-    updateToBins(selectedToWarehouse);
+    updateToBins(selectedToWarehouse, wrvBinList, wiqBinList, wcpBinList);
   }, [selectedToWarehouse]);
 
   return (
