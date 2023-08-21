@@ -40,6 +40,9 @@ const TransferPage = ({ username }) => {
   const [selectedToWarehouseName, setSelectedToWarehouseName] = useState("");
   const [toBins, setToBins] = useState([]);
   const [toBinsLocation, setToBinsLocation] = useState([]);
+  const [wcpBinList, setWcpBinList] = useState([]);
+  const [wrvBinList, setWrvBinList] = useState([]);
+  const [wiqBinList, setWiqBinList] = useState([]);
   const [toBinsByToWarehouse, setToBinsByToWarehouse] = useState([]);
   const [selectedToBin, setSelectedToBin] = useState("");
 
@@ -49,29 +52,6 @@ const TransferPage = ({ username }) => {
   const [transferDetailsSummary, setTransferDetailsSummary] = useState([]);
 
   const clearAll = () => {
-    setErrorMessage([]);
-    setBatchNumber("");
-    setItemCode("");
-    setItemDescription("");
-    setBatchStatus("");
-    setUomName("");
-    setRemarks("");
-    setPostingDate("");
-    setMaxQuantity("");
-    setEnteredQuantity("");
-    setBatchInBin([]);
-    setFromWarehouses([]);
-    setSelectedFromWarehouse("");
-    setFromBins([]);
-    setSelectedFromBin("");
-    setSelectedToWarehouse("");
-    setSelectedToWarehouseName("");
-    setToBins([]);
-    setSelectedToBin("");
-    setErrorTransferMessage([]);
-    setSuccessTransferMessage("");
-    setShowSummary(false);
-    setTransferDetailsSummary([]);
   };
 
   const handleBatchNumberChange = async (batchNumber) => {
@@ -161,21 +141,6 @@ const TransferPage = ({ username }) => {
         );
       }
 
-      setMaxQuantity("");
-      setBatchInBin([]);
-      setFromWarehouses([]);
-      setSelectedFromWarehouse("");
-      setFromBins([]);
-      setSelectedFromBin("");
-      setSelectedToWarehouse("");
-      setSelectedToWarehouseName("");
-      setToBins([]);
-      setSelectedToBin("");
-      setErrorTransferMessage([]);
-      setSuccessTransferMessage("");
-      setShowSummary(false);
-      setTransferDetailsSummary([]);
-
       if (response.data && response.data.value) {
         console.log(`setBatchInBin: ${response.data.value}`);
         setBatchInBin(response.data.value);
@@ -212,26 +177,29 @@ const TransferPage = ({ username }) => {
 
   const fetchBinLocations = async () => {
     try {
-      const warehouses = ["WIQ", "WRV", "WCP"];
-      for (const warehouse of warehouses) {
-        const response = await axios.post(
-          "http://localhost:3005/api/binlocations",
-          {
-            WarehouseCode: warehouse,
+      const response = await axios.post(
+        "http://localhost:3005/api/binlocations"
+      );
+      console.log(`fetchBinLocations: ${response.data}`);
+      if (response.data && response.data.value) {
+        response.data.value.forEach((item) => {
+          if (item.Warehouse === "WIQ") {
+            setWiqBinList((prevWiqBinList) => [
+              ...prevWiqBinList,
+              item.BinCode,
+            ]);
+          } else if (item.Warehouse === "WCP") {
+            setWcpBinList((prevWcpBinList) => [
+              ...prevWcpBinList,
+              item.BinCode,
+            ]);
+          } else if (item.Warehouse === "WRV") {
+            setWrvBinList((prevWrvBinList) => [
+              ...prevWrvBinList,
+              item.BinCode,
+            ]);
           }
-        );
-
-        console.log(`fetchBinLocations: ${response.data}`);
-
-        if (response.data && response.data.value) {
-          setToBins((prevToBins) => [
-            ...prevToBins,
-            ...response.data.value.map((item) => item.BinCode),
-          ]);
-          setToBinsLocation(response.data.value);
-        }
-
-        console.log(`toBins: ${toBins}`);
+        });
       }
     } catch (error) {
       console.log(`fetchBinLocations: ${error}`);
@@ -296,7 +264,7 @@ const TransferPage = ({ username }) => {
       W3Q: "Level 3 Quarantine Warehouse",
     };
 
-    const tempString = warehouseNames[warehouseCode] || "XXX";
+    const tempString = warehouseNames[warehouseCode] || "";
 
     if (fromOrToWarehouse === "from") {
       setSelectedFromWarehouseName(tempString);
@@ -322,29 +290,32 @@ const TransferPage = ({ username }) => {
     setFromBins(tempBin);
   };
 
-  const filterBinBySelectedToWarehouse = (
-    selectedToWarehouse,
-    toBinsLocation
-  ) => {
-    if (
-      selectedToWarehouse === "WIQ" ||
-      selectedToWarehouse === "WRV" ||
-      selectedToWarehouse === "WCP"
-    ) {
-      const tempBinCode = [];
-      for (let i = 0; i < toBinsLocation.length; i++) {
-        if (toBinsLocation[i].Warehouse === selectedToWarehouse) {
-          tempBinCode.push(toBinsLocation[i].BinCode);
-        }
-      }
-      setToBinsByToWarehouse(tempBinCode);
+  const updateToBins = (selectedToWarehouse) => {
+    if (selectedToWarehouse === "WRV") {
+      setToBins(wrvBinList);
+    } else if (selectedToWarehouse === "WIQ") {
+      setToBins(wiqBinList);
+    } else if (selectedToWarehouse === "WCP") {
+      setToBins(wcpBinList);
     } else {
-      setToBinsByToWarehouse([]);
+      setToBins([]);
     }
   };
 
+  const showSelectedWarehouse = () => {
+    setToWarehouses(["WIQ", "W3Q", "WFP", "WPQ", "WRJ", "WRV", "WRT", "WCP"]);
+  };
+
+  useEffect(() => {
+    fetchBinLocations();
+  }, []);
+
   useEffect(() => {
     handleBatchNumberChange(batchNumber);
+
+  }, [batchNumber]);
+
+  useEffect(() => {
     fetchBatchInBin(batchNumber);
     fetchBinLocations(batchNumber);
   }, [batchNumber]);
@@ -360,6 +331,7 @@ const TransferPage = ({ username }) => {
 
   useEffect(() => {
     getSelectedBinQty(selectedFromBin);
+    showSelectedWarehouse();
   }, [selectedFromBin]);
 
   useEffect(() => {
@@ -375,7 +347,10 @@ const TransferPage = ({ username }) => {
 
   useEffect(() => {
     warehouseFullName(selectedToWarehouse, "to");
-    filterBinBySelectedToWarehouse(selectedToWarehouse, toBinsLocation);
+  }, [selectedToWarehouse]);
+
+  useEffect(() => {
+    updateToBins(selectedToWarehouse);
   }, [selectedToWarehouse]);
 
   return (
@@ -391,7 +366,9 @@ const TransferPage = ({ username }) => {
           type="text"
           onChange={(event) => setBatchNumberInputBox(event.target.value)}
         />
-        <button onClick={() => setBatchNumber(batchNumberInputBox)}>Search</button>
+        <button onClick={() => setBatchNumber(batchNumberInputBox)}>
+          Search
+        </button>
       </div>
 
       <div className="input-group">
@@ -415,6 +392,9 @@ const TransferPage = ({ username }) => {
           value={selectedFromWarehouse}
           onChange={(event) => setSelectedFromWarehouse(event.target.value)}
         >
+          <option value="" disabled selected>
+            Select a warehouse
+          </option>
           {fromWarehouses.map((fromWarehouse) => (
             <option key={fromWarehouse} value={fromWarehouse}>
               {fromWarehouse}
@@ -430,6 +410,9 @@ const TransferPage = ({ username }) => {
           value={selectedFromBin}
           onChange={(event) => setSelectedFromBin(event.target.value)}
         >
+          <option value="" disabled selected>
+            Select a bin
+          </option>
           {fromBins.map((fromBin) => (
             <option key={fromBin} value={fromBin}>
               {fromBin}
@@ -444,6 +427,9 @@ const TransferPage = ({ username }) => {
           value={selectedToWarehouse}
           onChange={(event) => setSelectedToWarehouse(event.target.value)}
         >
+          <option value="" disabled selected>
+            Select a warehouse
+          </option>
           {toWarehouses.map((toWarehouse) => (
             <option key={toWarehouse} value={toWarehouse}>
               {toWarehouse}
@@ -459,7 +445,7 @@ const TransferPage = ({ username }) => {
           value={selectedToBin}
           onChange={(event) => setSelectedToBin(event.target.value)}
         >
-          {toBinsByToWarehouse.map((toBin) => (
+          {toBins.map((toBin) => (
             <option key={toBin} value={toBin}>
               {toBin}
             </option>
