@@ -44,30 +44,37 @@ function UserLogin({ onUserData }) {
   };
 
   return (
-    <div className="parentContainer">
-      <form onSubmit={handleSubmit} className="loginForm">
-        <h2>Sign in</h2>
-        {loginError && <div className="error">{loginError}</div>}
-        <div className="row">
-          <label>Username:</label>
-          <input
-            className="yellow-background"
-            type="text"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-          />
+    <div>
+      {loginError && (
+        <div className="error" style={{ color: "red", fontWeight: "bold" }}>
+          {loginError}
         </div>
-        <div className="row">
-          <label>Password:</label>
-          <input
-            className="yellow-background"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
+      )}
+
+      <div className="parentContainer">
+        <form onSubmit={handleSubmit} className="loginForm">
+          <h2>Sign in</h2>
+          <div className="row">
+            <label>Username:</label>
+            <input
+              className="yellow-background"
+              type="text"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+            />
+          </div>
+          <div className="row">
+            <label>Password:</label>
+            <input
+              className="yellow-background"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </div>
+          <button type="submit">Login</button>
+        </form>
+      </div>
     </div>
   );
 }
