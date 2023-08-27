@@ -1,0 +1,30 @@
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid white;
+  background-color: lightblue;
+  width: 900px;
+}
+
+.flex-item {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 5px;  /* 5px padding from the left */
+  padding-right: 5px;
+  border-bottom: 1px;
+}
+
+.flex-item > *:not(.ignore-button) {
+  width: 300px;
+  padding-left: 5px;  /* 5px padding from the left */
+}
+
+.ignore-button {
+  width: auto;  /* Reset to auto for buttons */
+  padding-left: 5px;  /* 5px padding from the left */
+}
+
+.invisible-button {
+  visibility: hidden;
+}

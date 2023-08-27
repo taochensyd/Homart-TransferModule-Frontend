@@ -149,19 +149,19 @@ const TransferPage = () => {
         setWrvBinList([]);
 
         response.data.value.forEach((item) => {
-          if (item.Warehouse === "WIQ") {
+          if (item.substring(0, 3) === "WIQ") {
             setWiqBinList((prevWiqBinList) => [
               ...prevWiqBinList,
               item.BinCode,
             ]);
             console.log(`WIQ Bin: ${item.BinCode}`);
-          } else if (item.Warehouse === "WCP") {
+          } else if (item.substring(0, 3) === "WCP") {
             setWcpBinList((prevWcpBinList) => [
               ...prevWcpBinList,
               item.BinCode,
             ]);
             console.log(`WCP Bin: ${item.BinCode}`);
-          } else if (item.Warehouse === "WRV") {
+          } else if (item.substring(0, 3) === "WRV") {
             setWrvBinList((prevWrvBinList) => [
               ...prevWrvBinList,
               item.BinCode,
@@ -175,6 +175,21 @@ const TransferPage = () => {
     }
   };
 
+
+  const setBinByToWarehouse = (selectedToWarehouse, wiqBinList, wrvBinList, wcpBinList) => {
+    if(selectedToWarehouse === "WIQ"){
+      setToBins(wiqBinList);
+      console.log(`wiqBinList: ${wiqBinList}`)
+    } else if(selectedToWarehouse === "WRV"){
+      setToBins(wrvBinList);
+      console.log(`wrvBinList: ${wrvBinList}`)
+    } else if(selectedToWarehouse === "WCP"){
+      setToBins(wcpBinList);
+      console.log(`wcpBinList: ${wcpBinList}`)
+    }
+    console.log(`ToBins in setBinByToWarehouse(): ${toBins}`)
+  }
+
   useEffect(() => {
     handleBatchNumberChange(batchNumber);
     fetchBatchInBin(batchNumber);
@@ -183,6 +198,15 @@ const TransferPage = () => {
   useEffect(() => {
     readWhCodeAndBin(batchInBin);
   }, [batchInBin]);
+
+  useEffect(() => {
+    fetchBinLocations(batchNumber);
+    console.log(`toBins in useEffect: ${toBins}`)
+  },[])
+
+  useEffect(() => {
+    setBinByToWarehouse(selectedToWarehouse, wiqBinList, wrvBinList, wcpBinList);
+  },[selectedToWarehouse])
 
   return (
     <div>
