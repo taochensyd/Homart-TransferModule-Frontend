@@ -31,6 +31,7 @@ const TransForm = ({ username }) => {
   const [selectedToBin, setSelectedToBin] = useState("");
   const [showSummary, setShowSummary] = useState(false);
   const [journalMemo, setJournalMemo] = useState("");
+  const [transferMessage, setTransferMessage] = useState("");
 
   const handleSearchBatchInBin = (batchNumber) => {
     fetch("http://localhost:3005/api/batchinbin", {
@@ -40,15 +41,31 @@ const TransForm = ({ username }) => {
       },
       body: JSON.stringify({ BatchNumber: batchNumber }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        console.log(`handleSearchBatchInBin function response: ${response}`)
+        return response.json();
+      })
       .then((data) => {
-        console.log(data);
+        console.log(`handleSearchBatchInBin function and data : ${data}`);
+        console.log(
+          `handleSearchBatchInBin function and data.value : ${data.value}`
+        );
+        console.log(
+          `handleSearchBatchInBin function and data.value[0] : ${data.value[0]}`
+        );
+        console.log(
+          `handleSearchBatchInBin function and data.value[0].ItemCode : ${data.value[0].ItemCode}`
+        );
         setBatchInBin(data.value);
         console.log(`batchInBin: ${batchInBin}`);
         setItemCode(data.value[0].ItemCode);
         setItemDesciption(data.value[0].ItemName);
         setFromWarehouse([...new Set(data.value.map((item) => item.WhsCode))]);
         setFromBinList([...new Set(data.value.map((item) => item.BinCode))]);
+
+        console.log(
+          `batchInBin in handleSearchBatchInBin function: ${batchInBin}`
+        );
 
         /*
                 [
@@ -129,7 +146,6 @@ const TransForm = ({ username }) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.value);
         setBatchStatus(data.value[0].Status);
         setUomName(data.value[0].U_InventoryUoM);
 
@@ -178,6 +194,8 @@ const TransForm = ({ username }) => {
     toBinList,
     batchNumber
   ) {
+    console.log(`submitTransfer batchinbin: ${batchInBin}`);
+
     if (
       (!itemCode ||
         !enteredQuantity ||
@@ -195,6 +213,11 @@ const TransForm = ({ username }) => {
         selectedFromWarehouse === "WRV")
     ) {
       console.error("Error: One or more parameters are missing values");
+      return;
+    }
+
+    if (!batchInBin || batchInBin.length < 0) {
+      console.error("Error: batchInBin is missing or empty");
       return;
     }
 
@@ -294,9 +317,23 @@ const TransForm = ({ username }) => {
       },
       body: JSON.stringify(body),
     })
-      .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((response) => {
+        if (response.status === 200 || response.status === 201) {
+          setTransferMessage(
+            `Status code: ${response.status}. Transfer complete.`
+          );
+        } else {
+          setTransferMessage(
+            `Status code: ${response.status}. Transfer failed.`
+          );
+        }
+      })
+      .then((data) => {
+        console.log(data);
+      })
       .catch((error) => console.error(error));
+
+    return;
   }
 
   const updateMaxQuantity = (
@@ -341,6 +378,27 @@ const TransForm = ({ username }) => {
       return;
     }
   };
+
+  function startClean() {
+    setErrorMessage({});
+    setItemCode("");
+    setItemDesciption("");
+    setBatchStatus("");
+    setUomName("");
+    setMaxQuantity(0);
+    setEnteredQuantity(0);
+    setSelectedDate(new Date().toISOString().slice(0, 10));
+    setEnteredRemark();
+    setFromWarehouse([]);
+    setSelectedFromWarehouse("");
+    setSelectedFromWarehouseName("");
+    setFromBin([]);
+    setSelectedFromBin("");
+    setToWarehouses([]);
+    setSelectedToWarehouse("");
+    setSelectedToBin("");
+    setShowSummary(false);
+  }
 
   const clearAll = () => {
     setErrorMessage({});
@@ -390,6 +448,7 @@ const TransForm = ({ username }) => {
 
   useEffect(() => {
     binLocations();
+    setShowSummary(true);
   }, []);
 
   useEffect(() => {
@@ -404,7 +463,7 @@ const TransForm = ({ username }) => {
   }, [selectedToWarehouse]);
 
   useEffect(() => {
-    clearAll();
+    // startClean();
     handleSearchBatchInBin(batchNumber);
     findBatchNumber(batchNumber);
   }, [batchNumber]);
@@ -625,6 +684,7 @@ const TransForm = ({ username }) => {
       </div>
 
       <div className="flex-item">
+        <div></div>
         <button className="ignore-button" onClick={() => clearAll()}>
           Clear All
         </button>
@@ -638,7 +698,7 @@ const TransForm = ({ username }) => {
         {showSummary && (
           <>
             <div>Summary: </div>
-            <div>Batch Number: {batchNumber}</div>
+            <div>Batch Number: {inputBatchNumber}</div>
             <div>From Warehouse: {selectedFromWarehouse}</div>
             <div>From Bin: {selectedFromBin}</div>
             <div>To Warehouse: {selectedToWarehouse}</div>
@@ -646,6 +706,7 @@ const TransForm = ({ username }) => {
             <div>Quantity: {enteredQuantity}</div>
             <div>Date: {selectedDate}</div>
             <div>Remark: {enteredRemark}</div>
+            <div>JournalMemo: {journalMemo}</div>
 
             <button className="ignore-button" onClick={cancelTransfer}>
               Cancel
@@ -653,6 +714,14 @@ const TransForm = ({ username }) => {
             <button className="ignore-button" onClick={submitTransfer}>
               Submit
             </button>
+          </>
+        )}
+      </div>
+
+      <div>
+        {transferMessage && (
+          <>
+            <div>{transferMessage}</div>
           </>
         )}
       </div>
