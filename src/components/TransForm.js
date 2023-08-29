@@ -7,7 +7,7 @@ const TransForm = ({ username }) => {
   const [inputBatchNumber, setInputBatchNumber] = useState("");
   const [batchInBin, setBatchInBin] = useState([]);
   const [itemCode, setItemCode] = useState("");
-  const [itemDescription, setItemDesciption] = useState("");
+  const [itemDescription, setItemDescription] = useState("");
   const [batchStatus, setBatchStatus] = useState("");
   const [uomName, setUomName] = useState("");
   const [maxQuantity, setMaxQuantity] = useState(0);
@@ -42,61 +42,20 @@ const TransForm = ({ username }) => {
       body: JSON.stringify({ BatchNumber: batchNumber }),
     })
       .then((response) => {
-        console.log(`handleSearchBatchInBin function response: ${response}`)
+        console.log(`handleSearchBatchInBin function response: ${response}`);
         return response.json();
       })
       .then((data) => {
-        console.log(`handleSearchBatchInBin function and data : ${data}`);
-        console.log(
-          `handleSearchBatchInBin function and data.value : ${data.value}`
-        );
-        console.log(
-          `handleSearchBatchInBin function and data.value[0] : ${data.value[0]}`
-        );
-        console.log(
-          `handleSearchBatchInBin function and data.value[0].ItemCode : ${data.value[0].ItemCode}`
-        );
         setBatchInBin(data.value);
-        console.log(`batchInBin: ${batchInBin}`);
         setItemCode(data.value[0].ItemCode);
-        setItemDesciption(data.value[0].ItemName);
+        setItemDescription(data.value[0].ItemName);
         setFromWarehouse([...new Set(data.value.map((item) => item.WhsCode))]);
         setFromBinList([...new Set(data.value.map((item) => item.BinCode))]);
 
         console.log(
           `batchInBin in handleSearchBatchInBin function: ${batchInBin}`
         );
-
-        /*
-                [
-                    {
-                        "ItemCode": "PC038-0010",
-                        "ItemName": "Cap 1HOM 38mm Gold Cap for RA300/185 with Induction Seal - JX",
-                        "DistNumber": "div6593",
-                        "batchabsebntry": 19426,
-                        "WhsCode": "WCP",
-                        "WhsName": "Component warehouse",
-                        "BinAbs": 671,
-                        "BinCode": "WCP-3K20-1",
-                        "OnHandQty": 19208,
-                        "id__": 1
-                    },
-                    {
-                        "ItemCode": "PC038-0010",
-                        "ItemName": "Cap 1HOM 38mm Gold Cap for RA300/185 with Induction Seal - JX",
-                        "DistNumber": "div6593",
-                        "batchabsebntry": 19426,
-                        "WhsCode": "WIQ",
-                        "WhsName": "Quantine warehouse",
-                        "BinAbs": 1155,
-                        "BinCode": "WIQ-7K52-1",
-                        "OnHandQty": 5447,
-                        "id__": 2
-                    }
-                ]
-                */
       })
-
       .catch((error) => console.error(error));
   };
 
@@ -188,14 +147,14 @@ const TransForm = ({ username }) => {
     selectedFromBin,
     selectedToWarehouse,
     selectedToBin,
-    remarks,
+    enteredRemark,
     journalMemo,
     batchInBin,
     toBinList,
     batchNumber
   ) {
+    updateJournalMemo();
     console.log(`submitTransfer batchinbin: ${batchInBin}`);
-
     if (
       (!itemCode ||
         !enteredQuantity ||
@@ -203,7 +162,6 @@ const TransForm = ({ username }) => {
         !selectedFromBin ||
         !selectedToWarehouse ||
         !selectedToBin ||
-        !remarks ||
         !journalMemo ||
         !batchInBin ||
         !toBinList ||
@@ -217,6 +175,7 @@ const TransForm = ({ username }) => {
     }
 
     if (!batchInBin || batchInBin.length < 0) {
+      console.log(batchInBin);
       console.error("Error: batchInBin is missing or empty");
       return;
     }
@@ -254,7 +213,7 @@ const TransForm = ({ username }) => {
             FromWarehouseCode: selectedFromWarehouse,
             SerialNumbers: [],
             JournalMemo: journalMemo,
-            Comment: remarks,
+            Comment: enteredRemark,
             BatchNumbers: [
               {
                 BatchNumber: batchNumber,
@@ -290,7 +249,7 @@ const TransForm = ({ username }) => {
             FromWarehouseCode: selectedFromWarehouse,
             SerialNumbers: [],
             JournalMemo: journalMemo,
-            Comment: remarks,
+            Comment: enteredRemark,
             BatchNumbers: [
               {
                 BatchNumber: batchNumber,
@@ -382,7 +341,7 @@ const TransForm = ({ username }) => {
   function startClean() {
     setErrorMessage({});
     setItemCode("");
-    setItemDesciption("");
+    setItemDescription("");
     setBatchStatus("");
     setUomName("");
     setMaxQuantity(0);
@@ -406,7 +365,7 @@ const TransForm = ({ username }) => {
     setInputBatchNumber("");
     setBatchInBin([]);
     setItemCode("");
-    setItemDesciption("");
+    setItemDescription("");
     setBatchStatus("");
     setUomName("");
     setMaxQuantity(0);
@@ -425,37 +384,52 @@ const TransForm = ({ username }) => {
     setShowSummary(false);
   };
 
-  const updateJournalMemo = async () => {
-    setJournalMemo("");
-    try {
-      const response = await fetch("http://localhost:3005/api/journalmemo");
-      const data = await response.json();
-      const jrnlMemo = data.value[0].JrnlMemo;
-      const transferNo = jrnlMemo.split(":")[1];
-      const transferDate = transferNo.slice(0, 8);
-      const transferCount = parseInt(transferNo.slice(8));
-      const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-      if (transferDate !== today) {
-        setJournalMemo(`WEB STOCK Transferno:${today}0001`);
-      } else {
-        const newCount = (transferCount + 1).toString().padStart(4, "0");
-        setJournalMemo(`WEB STOCK Transferno:${today}${newCount}`);
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  const updateJournalMemo = () => {
+    fetch("http://localhost:3005/api/journalmemo")
+      .then((response) => {
+        console.log(`http://localhost:3005/api/journalmemo`);
+        return response.json();
+      })
+      .then((data) => {
+        console.log("data.value[0].JrnlMemo" + data.value[0].JrnlMemo)
+        setJournalMemo(data.value[0].JrnlMemo)
+
+
+
+      //   const jrnlMemo = data.value[0].JrnlMemo;
+      //   console.log(`jrnlMemo in updateJournalMemo: ${jrnlMemo}`);
+      //   const transferNo = jrnlMemo.split(":")[1];
+      //   const transferDate = transferNo.slice(0, 8);
+      //   const transferCount = parseInt(transferNo.slice(8));
+      //   const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      //   if (transferDate !== today) {
+      //     setJournalMemo(`WEB STOCK Transferno:${today}0001`);
+      //     console.log(`WEB STOCK Transferno:${today}0001`);
+      //   } else {
+      //     const newCount = (transferCount + 1).toString().padStart(4, "0");
+      //     setJournalMemo(`WEB STOCK Transferno:${today}${newCount}`);
+      //     console.log(`WEB STOCK Transferno:${today}${newCount}`);
+      //   }
+      })
+      .catch((error) => console.error(error));
   };
 
   useEffect(() => {
-    binLocations();
-    setShowSummary(true);
-  }, []);
+    console.log(`with useEffect batchInBin: ${batchInBin}`);
+  }, [batchInBin]);
 
   useEffect(() => {
-    if (showSummary === true) {
-      updateJournalMemo();
-    }
-  }, [showSummary]);
+    console.log(`binLocations in useEffect`);
+    binLocations();
+    console.log(`updateJournalMemo in useEffect before calling`);
+    console.log(`updateJournalMemo in useEffect`);
+  }, [batchNumber]);
+
+  // useEffect(() => {
+  //   if (showSummary) {
+  //     updateJournalMemo();
+  //   }
+  // }, [showSummary]);
 
   useEffect(() => {
     setSelectedToBin("");
@@ -480,7 +454,7 @@ const TransForm = ({ username }) => {
     }
 
     updateMaxQuantity(selectedFromWarehouse, selectedFromBin, batchInBin);
-
+    console.log(`Function UpdateMaxQuantity: ${batchInBin}`);
     if (selectedFromWarehouse !== "") {
       if (selectedToWarehouse === "WIQ") {
         setSelectedFromWarehouseName("Incoming Quarantine Warehouse");
@@ -689,7 +663,14 @@ const TransForm = ({ username }) => {
           Clear All
         </button>
         <button className="invisible-button">Add</button>
-        <button className="ignore-button" onClick={() => setShowSummary(true)}>
+        <button
+          className="ignore-button"
+          onClick={() => {
+            setShowSummary(true);
+            setJournalMemo("Clicked")
+            updateJournalMemo();
+          }}
+        >
           Transfer
         </button>
       </div>
@@ -711,7 +692,24 @@ const TransForm = ({ username }) => {
             <button className="ignore-button" onClick={cancelTransfer}>
               Cancel
             </button>
-            <button className="ignore-button" onClick={submitTransfer}>
+            <button
+              className="ignore-button"
+              onClick={() =>
+                submitTransfer(
+                  itemCode,
+                  enteredQuantity,
+                  selectedFromWarehouse,
+                  selectedFromBin,
+                  selectedToWarehouse,
+                  selectedToBin,
+                  enteredRemark,
+                  journalMemo,
+                  batchInBin,
+                  toBinList,
+                  batchNumber
+                )
+              }
+            >
               Submit
             </button>
           </>
